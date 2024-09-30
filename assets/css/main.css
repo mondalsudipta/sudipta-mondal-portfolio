@@ -83,6 +83,8 @@ li > .active {
 }
 
 .pub-authors {
+font-size: 12px;
+    text-align: justify;
 	font-weight: 400;
 }
 
@@ -256,7 +258,7 @@ li > .active {
  .description {
             margin-top: 10px;
             margin-bottom: 10px;
-            color: #2c3e50;
+           
         }
         .tools {
             margin-bottom: 10px;

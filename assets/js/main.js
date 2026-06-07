@@ -1,338 +1,113 @@
-$(document).ready(function(){
-	// By default, all the divs are hidden, if you were to add a new div, you should hide it here.
-	// If you want to show a div, you should clic on the corresponding link on the navbar.
-	$('#educationContent').hide();
-	$('#publicationsContent').hide();
-	$('#experienceContent').hide();
-	$('#conferencesContent').hide();
-	$('#projectsContent').hide();
-	$('#blogContent').hide();
-	$('#academicContent').hide();
-	$('#particularContent').hide();
-	// $('#photosContent').hide();
+// ── Page Router ──────────────────────────────────────────────────────────────
+const pages = ['about', 'research', 'publications', 'cv'];
+const navLinks = document.querySelectorAll('nav a[data-page]');
+const contentEl = document.getElementById('content');
 
-	// Options menu is hidden by default
-	$('#theme').hide();
-	$('#lan').hide();
+async function loadPage(page) {
+  if (!pages.includes(page)) page = 'about';
 
-	// Handle 'About Me' content
-	$('#aboutme').click(function(e) {
+  // Update nav active state
+  navLinks.forEach(l => l.classList.toggle('active', l.dataset.page === page));
 
-		// If the div has already the class active, no need to reload the divs...
-		if(!$(e.target).hasClass('active')) {
-			// Update navbar
-			clearActiveLinks();
-			activateLink(e);
+  // Update URL hash
+  history.pushState({ page }, '', `#${page}`);
+  document.title = `Sudipta Mondal — ${page.charAt(0).toUpperCase() + page.slice(1)}`;
 
-			// Hide other contents
-			clearActiveDivs();
+  // Fetch and inject page fragment
+  contentEl.classList.add('loading');
+  try {
+    const res = await fetch(`pages/${page}.html`);
+    if (!res.ok) throw new Error('Page not found');
+    const html = await res.text();
+    contentEl.innerHTML = html;
+    contentEl.classList.remove('loading');
 
-			// Show current content
-			activateDiv('#aboutmeContent');
-		}
+    // Wrap zoomable images after content loads
+    initLightboxImages();
 
-	});
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
-	// Handle 'Education' content
-	$('#education').click(function(e) {
+    // Add fade-in class
+    const inner = contentEl.firstElementChild;
+    if (inner) { inner.classList.remove('page-fade'); void inner.offsetWidth; inner.classList.add('page-fade'); }
 
-		// If the div has already the class active, no need to reload the divs...
-		if(!$(e.target).hasClass('active')) {
-			// Update navbar
-			clearActiveLinks();
-			activateLink(e);
+  } catch (e) {
+    contentEl.innerHTML = '<div class="container"><p style="color:var(--ink-soft); padding-top:60px;">Page could not be loaded.</p></div>';
+    contentEl.classList.remove('loading');
+  }
+}
 
-			// Hide other contents
-			clearActiveDivs();
-
-			// Show current content
-			activateDiv('#educationContent');
-		}
-	});
-
-	// Handle 'Publications' content
-	$('#publications').click(function(e) {
-
-		// If the div has already the class active, no need to reload the divs...
-		if(!$(e.target).hasClass('active')) {
-			// Update navbar
-			clearActiveLinks();
-			activateLink(e);
-
-			// Hide other contents
-			clearActiveDivs();
-
-			// Show current content
-			activateDiv('#publicationsContent');
-		}
-	});
-
-	// Handle 'Blog' content
-	$('#blog').click(function(e) {
-
-		// If the div has already the class active, no need to reload the divs...
-		if(!$(e.target).hasClass('active')) {
-			// Update navbar
-			clearActiveLinks();
-			activateLink(e);
-
-			// Hide other contents
-			clearActiveDivs();
-
-			// Show current content
-			activateDiv('#blogContent');
-		}
-	});
-
-	// Handle 'Academic' content
-	$('#academic').click(function(e) {
-
-		// If the div has already the class active, no need to reload the divs...
-		if(!$(e.target).hasClass('active')) {
-			// Update navbar
-			clearActiveLinks();
-			activateLink(e);
-
-			// Hide other contents
-			clearActiveDivs();
-
-			// Show current content
-			activateDiv('#academicContent');
-		}
-	});
-
-	// Handle 'Particular' content
-	$('#particular').click(function(e) {
-
-		// If the div has already the class active, no need to reload the divs...
-		if(!$(e.target).hasClass('active')) {
-			// Update navbar
-			clearActiveLinks();
-			activateLink(e);
-
-			// Hide other contents
-			clearActiveDivs();
-
-			// Show current content
-			activateDiv('#particularContent');
-		}
-	});
-
-	// Handle 'Conferences' content
-	$('#conferences').click(function(e) {
-
-		// If the div has already the class active, no need to reload the divs...
-		if(!$(e.target).hasClass('active')) {
-			// Update navbar
-			clearActiveLinks();
-			activateLink(e);
-
-			// Hide other contents
-			clearActiveDivs();
-
-			// Show current content
-			activateDiv('#conferencesContent');
-		}
-	});
-
-	// Handle 'Experience' content
-	$('#experience').click(function(e) {
-
-		// If the div has already the class active, no need to reload the divs...
-		if(!$(e.target).hasClass('active')) {
-			// Update navbar
-			clearActiveLinks();
-			activateLink(e);
-
-			// Hide other contents
-			clearActiveDivs();
-
-			// Show current content
-			activateDiv('#experienceContent');
-		}
-	});
-
-	// Handle 'Projects' content
-	$('#projects').click(function(e) {
-
-		// If the div has already the class active, no need to reload the divs...
-		if(!$(e.target).hasClass('active')) {
-			// Update navbar
-			clearActiveLinks();
-			activateLink(e);
-
-			// Hide other contents
-			clearActiveDivs();
-
-			// Show current content
-			activateDiv('#projectsContent');
-		}
-	});
-
-
-	// Handle 'Photos' content
-	// $('#photos').click(function(e) {
-
-	// 	// If the div has already the class active, no need to reload the divs...
-	// 	if(!$(e.target).hasClass('active')) {
-	// 		// Update navbar
-	// 		clearActiveLinks();
-	// 		activateLink(e);
-
-	// 		// Hide other contents
-	// 		clearActiveDivs();
-
-	// 		// Show current content
-	// 		activateDiv('#photosContent');
-	// 	}
-	// });
-
-	// **************************** //
-	// Handles the Publications events
-	// **************************** //
-
-	// Copies the citation to the clipboard
-	$(document).on("click", "#citation", function(){
-		var text = $(this).parent().parent().next()[0].innerHTML;
-
-		navigator.clipboard.writeText(text);
-
-		toastr.success('Citation copied');
-	});
-
-	// ******************** //
-	// Handles the Blog events
-	// ******************** //
-
-	// Opens the blog post in a new tab
-	$('.clickable').click(function(e) {
-		window.open($(e.currentTarget)[0].childNodes[1].innerText, '_blank').focus();
-	});
-
-
-	// *************************** //
-	// Handle the rest of the content
-	// Omit this part if you don't have more content
-	// *************************** //
-	
-	// If the user has not selected a theme, then select the default one according to the user's preferences
-	if(localStorage.getItem("theme") === null){
-		localStorage.theme = "light";
-		if (window.matchMedia('(prefers-color-scheme: dark)').matches)
-			localStorage.theme = "dark";
-	}
-
-	// Always load the light theme
-	$('<link>').appendTo('head').attr({
-		type: 'text/css', 
-		rel: 'stylesheet',
-		href: 'assets/css/light.css'
-	});
-
-	// If the user has the dark theme, then replace the light theme with the dark one
-	if (localStorage.theme == "dark") {
-		$("link[href='assets/css/light.css']").remove();
-		$('<link>').appendTo('head').attr({
-			type: 'text/css', 
-			rel: 'stylesheet',
-			href: 'assets/css/dark.css'
-		});
-		$('#theme').empty().append("<i class='fa-duotone fa-lightbulb-slash'></i>");
-	}
-
-	// Controls the option menu toggler to show/hide the language and theme selectors
-	$('#options-toggler').click(function(e) {
-		if(!$(e.currentTarget).hasClass('active')) {
-			$(e.currentTarget).addClass('active');
-			$('#theme').show("fast");
-			$('#lan').show("fast");
-		}
-		else {
-			$(e.currentTarget).removeClass('active');
-			$('#theme').hide("fast");
-			$('#lan').hide("fast");
-		}
-	})
-
-	// Alternates between light and dark themes
-	$('#theme').click(function(e) {
-		if(localStorage.theme != "dark"){
-			$('#theme').empty().append("<i class='fa-duotone fa-lightbulb-slash'></i>");
-
-			localStorage.theme = "dark"
-			
-			$("link[href='assets/css/light.css']").remove();
-			$('<link>').appendTo('head').attr({
-				type: 'text/css', 
-				rel: 'stylesheet',
-				href: 'assets/css/dark.css'
-			});
-		}
-		else {
-			$('#theme').empty().append("<i class='fa-duotone fa-lightbulb'></i>");
-
-			localStorage.theme = "light"
-			
-			$("link[href='assets/css/dark.css']").remove();
-			$('<link>').appendTo('head').attr({
-				type: 'text/css', 
-				rel: 'stylesheet',
-				href: 'assets/css/light.css'
-			});
-		}
-	})
-
-	
-	// Create the language manager
-	const langManager = new LanguageManager();
-	
-	// Alternates between the different available languages
-	$('#lan').click(function() {
-        const newLang = langManager.getNextLanguage();
-        langManager.setLanguage(newLang);
-    });
+// Nav clicks
+navLinks.forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    loadPage(link.dataset.page);
+  });
 });
 
-// Clears the active links
-function clearActiveLinks() {
-	$('#navbarList .nav-item .nav-link').each(function() {
-		$(this).removeClass('active');
-	});
+// Browser back/forward
+window.addEventListener('popstate', e => {
+  const page = e.state?.page || location.hash.replace('#', '') || 'about';
+  loadPage(page);
+});
+
+// Initial load from hash
+const initialPage = location.hash.replace('#', '') || 'about';
+loadPage(initialPage);
+
+
+// ── Lightbox ─────────────────────────────────────────────────────────────────
+function initLightboxImages() {
+  document.querySelectorAll(
+    '.cs-img-col img, .cs-single-img img, .cs-sketch-pair img'
+  ).forEach(img => {
+    if (img.closest('.cs-zoomable')) return; // already wrapped
+    const wrapper = document.createElement('span');
+    wrapper.className = 'cs-zoomable';
+    const icon = document.createElement('span');
+    icon.className = 'cs-zoom-icon';
+    icon.innerHTML = '<i class="fas fa-search-plus"></i>';
+    img.parentNode.insertBefore(wrapper, img);
+    wrapper.appendChild(img);
+    wrapper.appendChild(icon);
+    wrapper.addEventListener('click', () => openLightbox(img.src, img.alt));
+  });
 }
 
-// Clears the active divs
-function clearActiveDivs() {
-	$('.container .content .active').each(function() {
-		$(this).removeClass('active');
-		$(this).hide();
-	});
+function openLightbox(src, caption) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox-img').alt = caption || '';
+  document.getElementById('lightbox-caption').textContent = caption || '';
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
-// Activates the link
-function activateLink(e) {
-	$(e.target).addClass('active');
-	
-	// Hide left panel
-	if(e.target.id == "particular")
-		$('#leftPanel').hide();
-	else
-		$('#leftPanel').show();
+function closeLightbox(e) {
+  if (e && e.target === document.getElementById('lightbox-img')) return;
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
-// Activates the div
-function activateDiv(divId) {
-	$(divId).addClass('active');
-	$(divId).show();
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
-	// Scrolls to the content
-	scrollToContent(divId);
+
+// ── Abstract toggle ───────────────────────────────────────────────────────────
+function toggleAbstract(btn) {
+  const abs = btn.nextElementSibling;
+  const open = abs.classList.toggle('open');
+  btn.textContent = open ? '▾ Hide abstract' : '▸ Show abstract';
 }
 
-// Scrolls to the content
-function scrollToContent(divId) {
-	if ($(window).width() < 751) {
-		$('html, body').animate({
-			scrollTop: $(divId).offset().top
-		}, 1);
-	}
+
+// ── BibTeX copy ───────────────────────────────────────────────────────────────
+function copyBibtex(e, id) {
+  e.preventDefault();
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = e.target.closest('a');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+  });
 }
